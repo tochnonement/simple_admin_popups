@@ -130,28 +130,34 @@ do
     end)
 end
 
-net.Receive('sap:ClaimTicket', function(len, ply)
-    local target = sap.ReadPlayer()
+do
+    local ReadPlayer = sap.ReadPlayer
+    local WritePlayer = sap.WritePlayer
+    local Start = net.Start
 
-    if IsAdmin(ply) and IsValid(target) then
-        local ticket = FindTicket(target)
+    net.Receive('sap:ClaimTicket', function(len, ply)
+        local target = ReadPlayer()
 
-        if ticket then
-            net.Start('sap:TicketClaimed')
-                sap.WritePlayer(ply)
-                sap.WritePlayer(target)
-            SendToAdmins()
+        if IsAdmin(ply) and IsValid(target) then
+            local ticket = FindTicket(target)
+
+            if ticket then
+                Start('sap:TicketClaimed')
+                    WritePlayer(ply)
+                    WritePlayer(target)
+                SendToAdmins()
+            end
         end
-    end
-end)
+    end)
 
-net.Receive('sap:CloseTicket', function(len, ply)
-    local target = sap.ReadPlayer()
+    net.Receive('sap:CloseTicket', function(len, ply)
+        local target = ReadPlayer()
 
-    if IsAdmin(ply) and IsValid(target) then
-        RemoveTicket(ply)
-    end
-end)
+        if IsAdmin(ply) and IsValid(target) then
+            RemoveTicket(ply)
+        end
+    end)
+end
 
 sap.CreateTicket = CreateTicket
 sap.GetTickets = GetTickets

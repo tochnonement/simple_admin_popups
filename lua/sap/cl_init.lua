@@ -17,11 +17,13 @@ end
 do
     local popups = {}
 
-    local ReadEntity = sap.ReadPlayer
+    local ReadPlayer = sap.ReadPlayer
     local ReadString = net.ReadString
     local SendToServer = net.SendToServer
     local net_Start = net.Start
     local insert = table.insert
+    local format = string.format
+    local ipairs = ipairs
 
     local function movePopups()
         local basePos = ScreenScale(5)
@@ -50,7 +52,7 @@ do
     end
 
     net.Receive('sap:NewTicket', function()
-        local ply, text = ReadEntity(), ReadString()
+        local ply, text = ReadPlayer(), ReadString()
 
         local popup = vgui.Create('sap.Popup')
         popup:SetPos(10, 10)
@@ -73,7 +75,7 @@ do
     end)
 
     net.Receive('sap:TicketClosed', function()
-        local ply = ReadEntity()
+        local ply = ReadPlayer()
         local popup = findPopup(ply)
 
         if IsValid(popup) then
@@ -87,12 +89,12 @@ do
     end)
 
     net.Receive('sap:TicketClaimed', function()
-        local admin = ReadEntity()
-        local ply = ReadEntity()
+        local admin = ReadPlayer()
+        local ply = ReadPlayer()
         local popup = findPopup(ply)
 
         if IsValid(admin) and IsValid(ply) and popup then
-            local newTitle = string.format('%s - Claimed by %s', popup.lblTitle:GetText(), admin:Name())
+            local newTitle = format('%s - Claimed by %s', popup.lblTitle:GetText(), admin:Name())
 
             popup.lblTitle:SetText(newTitle)
 
