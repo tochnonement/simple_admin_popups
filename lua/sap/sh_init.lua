@@ -23,3 +23,23 @@ do
         end
     end
 end
+
+do
+    local function catchAdminMod()
+        local id = ''
+        if sam then
+            id = 'sam'
+        elseif serverguard then
+            id = 'serverguard'
+        elseif ulx then
+            id = 'ulx'
+        end
+        return id
+    end
+
+    hook.Add('PostGamemodeLoaded', 'sap.CatchAdminMod', function()
+        if sap.config.AdminMod == nil then
+            sap.config.AdminMod = catchAdminMod()
+        end
+    end)
+end

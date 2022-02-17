@@ -1,7 +1,8 @@
 local config = sap.config
 
--- Available options: 'sam', 'ulx'
-config.AdminMod = 'sam'
+-- Available options: 'sam', 'ulx', 'serverguard'
+-- Set it to nil to find admin mod automatically
+config.AdminMod = nil
 -- The command to create a ticket
 config.Command = '!r'
 -- Enable autoclose for tickets
