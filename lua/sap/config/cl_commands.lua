@@ -1,16 +1,16 @@
 sap.CreateCommand('goto', {
     name = 'Goto',
-    icon = 'https://i.imgur.com/JZ68F3c.png',
+    icon = 'https://i.imgur.com/825vH9b.png',
     callbacks = {
         ['sam'] = function(ply)
-            RunConsoleCommand('sam', 'bring', ply:SteamID64())
+            RunConsoleCommand('sam', 'goto', ply:SteamID64())
         end
     }
 })
 
 sap.CreateCommand('bring', {
     name = 'Bring',
-    icon = 'https://i.imgur.com/raABZXo.png',
+    icon = 'https://i.imgur.com/rza3lYM.png',
     callbacks = {
         ['sam'] = function(ply)
             RunConsoleCommand('sam', 'bring', ply:SteamID64())
@@ -23,7 +23,11 @@ sap.CreateCommand('freeze', {
     icon = 'https://i.imgur.com/LgPUsyg.png',
     callbacks = {
         ['sam'] = function(ply)
-            RunConsoleCommand('sam', 'freeze', ply:SteamID64())
+            if ply:IsFlagSet(FL_FROZEN) then
+                RunConsoleCommand('sam', 'unfreeze', ply:SteamID64())
+            else
+                RunConsoleCommand('sam', 'freeze', ply:SteamID64())
+            end
         end
     }
 })

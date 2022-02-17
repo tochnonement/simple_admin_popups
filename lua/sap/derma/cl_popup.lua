@@ -13,7 +13,7 @@ local PANEL = {}
 
 function PANEL:Init()
     self.header = self:Add('Panel')
-    self.header.color = sap.config.IdleColor
+    self.header.color = sap.config.HeaderColor
     self.header.Paint = function(p, w, h)
         draw_RoundedBoxEx(4, 0, 0, w, h, p.color, true, true)
     end
@@ -63,7 +63,9 @@ function PANEL:GetBestHeight()
     local tall, btnTall, textTall = 0, 0, select(2, self.lblText:GetContentSize())
 
     for _, child in ipairs(self.commands:GetChildren()) do
-        btnTall = btnTall + child:GetTall() + select(4, child:GetDockMargin())
+        if child:IsVisible() then
+            btnTall = btnTall + child:GetTall() + select(4, child:GetDockMargin())
+        end
     end
 
     tall = tall + math.max(btnTall, textTall)
@@ -75,7 +77,10 @@ end
 
 function PANEL:AddCommands()
     for _, cmd in ipairs(sap.GetCommands()) do
-        self:AddButton(cmd.name, cmd.icon)
+        local callback = cmd.callbacks[sap.config.AdminMod]
+        if callback then
+            self:AddButton(cmd.name, cmd.icon, callback)
+        end
     end
 end
 

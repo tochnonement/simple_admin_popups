@@ -69,6 +69,7 @@ do
                 popup:SetHeight(height)
                 popup:SetAlpha(0)
                 popup:AlphaTo(255, 0.33)
+                popup.resized = true
                 movePopups()
             end
         end)
@@ -108,6 +109,11 @@ do
                 popup.header.color = sap.config.ClaimedColor
             else
                 popup.claim:SetVisible(false)
+                if popup.resized then
+                    local height = popup:GetBestHeight()
+                    popup:SetHeight(height)
+                end
+                popup.header.color = sap.config.UnclaimedColor
             end
         end
     end)

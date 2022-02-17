@@ -112,16 +112,15 @@ do
         remove(args, 1)
         local msg = Trim(concat(args, ' '))
 
-        if
-            cmd == config.Command
-            and msg ~= ''
-            and Run('PlayerCanCreateTicket', ply, text) ~= false
-        then
-            if FindTicket(ply) == nil then
-                CreateTicket(ply, msg)
-            else
-                -- notify
+        if cmd == config.Command and msg ~= '' then
+            if Run('PlayerCanCreateTicket', ply, text) ~= false then
+                if FindTicket(ply) == nil then
+                    CreateTicket(ply, msg)
+                else
+                    -- notify
+                end
             end
+            return ''
         end
     end)
 
@@ -133,7 +132,9 @@ end
 do
     local ReadPlayer = sap.ReadPlayer
     local WritePlayer = sap.WritePlayer
+    local format = string.format
     local Start = net.Start
+    local timer_Remove = timer.Remove
 
     net.Receive('sap:ClaimTicket', function(len, ply)
         local target = ReadPlayer()
@@ -142,10 +143,14 @@ do
             local ticket = FindTicket(target)
 
             if ticket then
+                timer_Remove(format('sap.ticket_%s', target:SteamID64()))
+
                 Start('sap:TicketClaimed')
                     WritePlayer(ply)
                     WritePlayer(target)
                 SendToAdmins()
+
+                hook.Run('PlayerClaimedTicket', ply, target)
             end
         end
     end)
@@ -154,10 +159,12 @@ do
         local target = ReadPlayer()
 
         if IsAdmin(ply) and IsValid(target) then
-            RemoveTicket(ply)
+            RemoveTicket(target)
         end
     end)
 end
 
 sap.CreateTicket = CreateTicket
+sap.RemoveTicket = RemoveTicket
+sap.FindTicket = FindTicket
 sap.GetTickets = GetTickets

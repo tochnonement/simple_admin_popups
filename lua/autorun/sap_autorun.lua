@@ -9,6 +9,7 @@ AddCSLuaFile('sap/config/cl_commands.lua')
 AddCSLuaFile('sap/libraries/cl_webicon.lua')
 
 include('sap/config/sh_config.lua')
+include('sap/sh_init.lua')
 
 if SERVER then
     include('sap/sv_init.lua')
@@ -18,7 +19,5 @@ else
     include('sap/config/cl_commands.lua')
     include('sap/derma/cl_popup.lua')
 end
-
-include('sap/sh_init.lua')
 
 hook.Run('sap.Loaded')
