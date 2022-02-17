@@ -25,6 +25,7 @@ do
 end
 
 do
+    local waitGamemode = (GM or GAMEMODE) == nil and hook.Add or function(_, _, fn) fn() end
     local function catchAdminMod()
         local id = ''
         if sam then
@@ -37,7 +38,7 @@ do
         return id
     end
 
-    hook.Add('PostGamemodeLoaded', 'sap.CatchAdminMod', function()
+    waitGamemode('PostGamemodeLoaded', 'sap.CatchAdminMod', function()
         if sap.config.AdminMod == nil then
             sap.config.AdminMod = catchAdminMod()
         end
