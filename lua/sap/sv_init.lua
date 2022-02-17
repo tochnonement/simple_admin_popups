@@ -3,20 +3,32 @@ local config = sap.config
 
 util.AddNetworkString('sap:NewTicket')
 util.AddNetworkString('sap:CloseTicket')
+util.AddNetworkString('sap:ClaimTicket')
+util.AddNetworkString('sap:TicketClosed')
+util.AddNetworkString('sap:TicketClaimed')
 
-local GetAdmins do
+local GetAdmins, IsAdmin, SendToAdmins do
     local GetPlayers = player.GetAll
+
+    function IsAdmin(ply)
+        return ply:IsAdmin()
+    end
 
     function GetAdmins()
         local result, index = {}, 0
         local players = GetPlayers()
         for _, ply in ipairs(players) do
-            if ply:IsAdmin() then
+            if IsAdmin(ply) then
                 index = index + 1
                 result[index] = ply
             end
         end
         return result
+    end
+
+    function SendToAdmins()
+        local admins = GetAdmins()
+        net.Send(admins)
     end
 end
 
@@ -43,6 +55,8 @@ local CreateTicket, GetTickets, FindTicket, RemoveTicket do
         }
 
         net_Start('sap:NewTicket')
+            sap.WritePlayer(ply)
+            net.WriteString(text)
         net_Send(admins)
 
         if config.AutoCloseEnabled then
@@ -69,7 +83,8 @@ local CreateTicket, GetTickets, FindTicket, RemoveTicket do
             remove(storage, ticket.index)
             index = index - 1
 
-            net.Start('sap:CloseTicket')
+            net.Start('sap:TicketClosed')
+                sap.WritePlayer(ply)
             net.Send(admins)
 
             timer_Remove(format('sap.ticket_%s', ply:SteamID64()))
@@ -102,7 +117,11 @@ do
             and msg ~= ''
             and Run('PlayerCanCreateTicket', ply, text) ~= false
         then
-            CreateTicket(ply, msg)
+            if FindTicket(ply) == nil then
+                CreateTicket(ply, msg)
+            else
+                -- notify
+            end
         end
     end)
 
@@ -110,6 +129,29 @@ do
         RemoveTicket(ply)
     end)
 end
+
+net.Receive('sap:ClaimTicket', function(len, ply)
+    local target = sap.ReadPlayer()
+
+    if IsAdmin(ply) and IsValid(target) then
+        local ticket = FindTicket(target)
+
+        if ticket then
+            net.Start('sap:TicketClaimed')
+                sap.WritePlayer(ply)
+                sap.WritePlayer(target)
+            SendToAdmins()
+        end
+    end
+end)
+
+net.Receive('sap:CloseTicket', function(len, ply)
+    local target = sap.ReadPlayer()
+
+    if IsAdmin(ply) and IsValid(target) then
+        RemoveTicket(ply)
+    end
+end)
 
 sap.CreateTicket = CreateTicket
 sap.GetTickets = GetTickets
