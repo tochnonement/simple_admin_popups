@@ -59,6 +59,14 @@ do
         popup:SetSize(ScrW() * 0.2, 1)
         popup:SetPlayer(ply, text)
         popup:SetPaintedManually(true)
+        popup.btnClose.DoClick = function()
+            popup.finished = true
+            movePopups()
+            popup:AlphaTo(0, 0.33, nil, function(anim, panel)
+                panel:Remove()
+                table.remove(popups, panel.index)
+            end)
+        end
 
         popup.index = insert(popups, popup)
 
@@ -106,6 +114,7 @@ do
                         sap.WritePlayer(popup.player)
                     SendToServer()
                 end
+                popup.btnClose:SetVisible(false)
                 popup.header.color = sap.config.ClaimedColor
             else
                 popup.claim:SetVisible(false)

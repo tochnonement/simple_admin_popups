@@ -25,6 +25,12 @@ function PANEL:Init()
     self.lblTitle:SetFont('sap.Default')
     self.lblTitle:SetTextColor(color_white)
 
+    self.btnClose = self.header:Add('DButton')
+    self.btnClose:SetText('X')
+    self.btnClose:SetFont('sap.Default')
+    self.btnClose:SetTextColor(sap.config.TextColor)
+    self.btnClose.Paint = nil
+
     self.lblText = self:Add('DLabel')
     self.lblText:SetWrap(true)
     self.lblText:SetContentAlignment(7)
@@ -45,6 +51,9 @@ function PANEL:PerformLayout(w, h)
 
     self.lblTitle:Dock(FILL)
     self.lblTitle:DockMargin(gap, 0, 0, 0)
+
+    self.btnClose:Dock(RIGHT)
+    self.btnClose:SetWide(self.header:GetTall())
 
     self.lblText:Dock(LEFT)
     self.lblText:SetWide(w * 0.6)
