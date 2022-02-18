@@ -14,6 +14,28 @@ config.Delay = 30
 -- Should people, who have created a ticket receive a notification  when someone claimed their ticket
 config.ClaimNotify = true
 
+do
+    local adminmods = {
+        ['ulx'] = function(ply)
+            return ply:query('ulx seeasay')
+        end,
+        ['serverguard'] = function(ply)
+            return serverguard.player:HasPermission(ply, 'Manage Reports')
+        end,
+        ['sam'] = function(ply)
+            return ply:HasPermission('see_admin_chat')
+        end
+    }
+
+    config.HasAccess = function(ply)
+        local checker = adminmods[config.AdminMod]
+        if checker then
+            return checker(ply)
+        end
+        return ply:IsAdmin()
+    end
+end
+
 if SERVER then return end
 
 config.UnclaimedColor = Color(183, 21, 64)

@@ -12,7 +12,7 @@ local GetAdmins, IsAdmin, SendToAdmins do
     local GetPlayers = player.GetAll
 
     function IsAdmin(ply)
-        return ply:IsAdmin()
+        return config.HasAccess(ply) == true
     end
 
     function GetAdmins()
