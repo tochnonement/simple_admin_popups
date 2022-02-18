@@ -6,6 +6,7 @@ util.AddNetworkString('sap:CloseTicket')
 util.AddNetworkString('sap:ClaimTicket')
 util.AddNetworkString('sap:TicketClosed')
 util.AddNetworkString('sap:TicketClaimed')
+util.AddNetworkString('sap:ChatMessage')
 
 local GetAdmins, IsAdmin, SendToAdmins do
     local GetPlayers = player.GetAll
@@ -32,7 +33,10 @@ local GetAdmins, IsAdmin, SendToAdmins do
     end
 end
 
-local CreateTicket, GetTickets, FindTicket, RemoveTicket do
+local CreateTicket, GetTickets, FindTicket, RemoveTicket, ChatMessage do
+    local WritePlayer = sap.WritePlayer
+    local WriteString = net.WriteString
+    local WriteUInt = net.WriteUInt
     local remove = table.remove
     local time = os.time
     local format = string.format
@@ -55,8 +59,8 @@ local CreateTicket, GetTickets, FindTicket, RemoveTicket do
         }
 
         net_Start('sap:NewTicket')
-            sap.WritePlayer(ply)
-            net.WriteString(text)
+            WritePlayer(ply)
+            WriteString(text)
         net_Send(admins)
 
         if config.AutoCloseEnabled then
@@ -83,9 +87,9 @@ local CreateTicket, GetTickets, FindTicket, RemoveTicket do
             remove(storage, ticket.index)
             index = index - 1
 
-            net.Start('sap:TicketClosed')
-                sap.WritePlayer(ply)
-            net.Send(admins)
+            net_Start('sap:TicketClosed')
+                WritePlayer(ply)
+            net_Send(admins)
 
             timer_Remove(format('sap.ticket_%s', ply:SteamID64()))
 
@@ -97,12 +101,19 @@ local CreateTicket, GetTickets, FindTicket, RemoveTicket do
     function GetTickets()
         return storage
     end
+
+    function ChatMessage(ply, msgId)
+        net_Start('sap:ChatMessage')
+            WriteUInt(msgId, 4)
+        net_Send(ply)
+    end
 end
 
 do
     local Explode = string.Explode
     local Trim = string.Trim
     local Run = hook.Run
+    local Time = CurTime
     local concat = table.concat
     local remove = table.remove
 
@@ -111,14 +122,17 @@ do
         local cmd = args[1]
         remove(args, 1)
         local msg = Trim(concat(args, ' '))
+        local curtime = Time()
 
         if cmd == config.Command and msg ~= '' then
-            if Run('PlayerCanCreateTicket', ply, text) ~= false then
-                if FindTicket(ply) == nil then
+            if ply:GetVar('sap_Delay', 0) <= curtime then
+                if Run('PlayerCanCreateTicket', ply, text) ~= false and FindTicket(ply) == nil then
                     CreateTicket(ply, msg)
-                else
-                    -- notify
+                    ChatMessage(ply, sap.messages.MSG_CREATED)
+                    ply:SetVar('sap_Delay', curtime + sap.config.Delay)
                 end
+            else
+                ChatMessage(ply, sap.messages.MSG_DELAY)
             end
             return ''
         end
@@ -150,6 +164,12 @@ do
                     WritePlayer(target)
                 SendToAdmins()
 
+                ChatMessage(ply, sap.messages.MSG_CLAIMED)
+
+                if sap.config.ClaimNotify then
+                    ChatMessage(target, sap.messages.MSG_CLAIMED_TO_PLAYER)
+                end
+
                 hook.Run('PlayerClaimedTicket', ply, target)
             end
         end
@@ -160,6 +180,8 @@ do
 
         if IsAdmin(ply) and IsValid(target) then
             RemoveTicket(target)
+
+            ChatMessage(ply, sap.messages.MSG_CLOSED)
         end
     end)
 end

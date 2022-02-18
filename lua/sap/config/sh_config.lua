@@ -9,6 +9,10 @@ config.Command = '!r'
 config.AutoCloseEnabled = true
 -- The time after which a ticket will be automatically closed
 config.AutoCloseTime = 30
+-- The delay between creating tickets
+config.Delay = 30
+-- Should people, who have created a ticket receive a notification  when someone claimed their ticket
+config.ClaimNotify = true
 
 if SERVER then return end
 
