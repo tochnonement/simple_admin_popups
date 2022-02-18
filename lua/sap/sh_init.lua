@@ -93,7 +93,7 @@ do
         return id
     end
 
-    waitGamemode('PostGamemodeLoaded', 'sap.CatchAdminMod', function()
+    waitGamemode('Initialize', 'sap.CatchAdminMod', function()
         if sap.config.AdminMod == nil then
             sap.config.AdminMod = catchAdminMod()
         end
