@@ -78,24 +78,3 @@ do
         end
     end
 end
-
-do
-    local waitGamemode = (GM or GAMEMODE) == nil and hook.Add or function(_, _, fn) fn() end
-    local function catchAdminMod()
-        local id = ''
-        if sam then
-            id = 'sam'
-        elseif serverguard then
-            id = 'serverguard'
-        elseif ulx then
-            id = 'ulx'
-        end
-        return id
-    end
-
-    waitGamemode('Initialize', 'sap.CatchAdminMod', function()
-        if sap.config.AdminMod == nil then
-            sap.config.AdminMod = catchAdminMod()
-        end
-    end)
-end

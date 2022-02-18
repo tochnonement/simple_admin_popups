@@ -13,6 +13,8 @@ config.AutoCloseTime = 30
 config.Delay = 30
 -- Should people, who have created a ticket receive a notification  when someone claimed their ticket
 config.ClaimNotify = true
+-- Enable debug mode
+config.Debug = false
 
 do
     local adminmods = {
@@ -34,6 +36,27 @@ do
         end
         return ply:IsAdmin()
     end
+end
+
+do
+    local waitGamemode = (GM or GAMEMODE) == nil and hook.Add or function(_, _, fn) fn() end
+    local function catchAdminMod()
+        local id = ''
+        if sam then
+            id = 'sam'
+        elseif serverguard then
+            id = 'serverguard'
+        elseif ulx then
+            id = 'ulx'
+        end
+        return id
+    end
+
+    waitGamemode('Initialize', 'sap.CatchAdminMod', function()
+        if sap.config.AdminMod == nil then
+            sap.config.AdminMod = catchAdminMod()
+        end
+    end)
 end
 
 if SERVER then return end
