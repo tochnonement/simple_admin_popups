@@ -140,21 +140,3 @@ function PANEL:SetPlayer(ply, text)
 end
 
 vgui.Register('sap.Popup', PANEL)
-
--- -- ANCHOR Test
-
--- if IsValid(DebugPanel) then
---     DebugPanel:Remove()
--- end
-
--- DebugPanel = vgui.Create('sap.Popup')
--- DebugPanel:SetSize(ScrW() * 0.2, ScrH() * 0.2)
--- DebugPanel:SetPos(10, 10)
--- DebugPanel:InvalidateLayout(true)
-
--- -- timer.Simple(2, afun)
--- timer.Simple(0.1, function()
---     local height = DebugPanel:GetBestHeight()
-    
---     DebugPanel:SetTall(height)
--- end)
