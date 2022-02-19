@@ -126,7 +126,7 @@ do
 
         if cmd == config.Command and msg ~= '' then
             if ply:GetVar('sap_Delay', 0) <= curtime then
-                if (config.AdminsCanCreateReports and true or not IsAdmin(ply)) and Run('PlayerCanCreateTicket', ply, text) ~= false and FindTicket(ply) == nil then
+                if (config.AdminsCanCreateTickets and true or not IsAdmin(ply)) and Run('PlayerCanCreateTicket', ply, text) ~= false and FindTicket(ply) == nil then
                     CreateTicket(ply, msg)
                     ChatMessage(ply, sap.messages.MSG_CREATED)
                     ply:SetVar('sap_Delay', curtime + sap.config.Delay)
