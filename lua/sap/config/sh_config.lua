@@ -13,6 +13,8 @@ config.AutoCloseTime = 30
 config.Delay = 30
 -- Should people, who have created a ticket receive a notification  when someone claimed their ticket
 config.ClaimNotify = true
+-- Allow admins to create a report
+config.AdminsCanCreateReports = true
 -- Enable debug mode
 config.Debug = false
 
