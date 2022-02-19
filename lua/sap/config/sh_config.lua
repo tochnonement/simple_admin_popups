@@ -44,6 +44,9 @@ do
     local waitGamemode = (GM or GAMEMODE) == nil and hook.Add or function(_, _, fn) fn() end
     local function catchAdminMod()
         local id = ''
+        if FAdmin then
+            id = 'fadmin'
+        end
         if sam then
             id = 'sam'
         elseif serverguard then

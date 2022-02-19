@@ -8,6 +8,9 @@ sap.CreateCommand('goto', {
         ['serverguard'] = function(ply)
             RunConsoleCommand('sg', 'goto', ply:SteamID())
         end,
+        ['fadmin'] = function(ply)
+            RunConsoleCommand('fadmin', 'goto', ply:SteamID())
+        end,
         ['ulx'] = function(ply)
             RunConsoleCommand('ulx', 'goto', ply:Name())
         end
@@ -24,35 +27,43 @@ sap.CreateCommand('bring', {
         ['serverguard'] = function(ply)
             RunConsoleCommand('sg', 'bring', ply:SteamID())
         end,
+        ['fadmin'] = function(ply)
+            RunConsoleCommand('fadmin', 'bring', ply:SteamID())
+        end,
         ['ulx'] = function(ply)
             RunConsoleCommand('ulx', 'bring', ply:Name())
         end
     }
 })
 
-sap.CreateCommand('freeze', {
-    name = 'Freeze',
-    icon = 'https://i.imgur.com/LgPUsyg.png',
-    callbacks = {
-        ['sam'] = function(ply)
-            if ply:IsFlagSet(FL_FROZEN) then
-                RunConsoleCommand('sam', 'unfreeze', ply:SteamID64())
-            else
-                RunConsoleCommand('sam', 'freeze', ply:SteamID64())
-            end
-        end,
-        ['serverguard'] = function(ply)
-            RunConsoleCommand('sg', 'freeze', ply:SteamID())
-        end,
-        ['ulx'] = function(ply)
-            if ply:IsFlagSet(FL_FROZEN) then
-                RunConsoleCommand('ulx', 'unfreeze', ply:Name())
-            else
-                RunConsoleCommand('ulx', 'freeze', ply:Name())
-            end
+do
+    local function ToggleFreeze(prefix, identifier, ply)
+        if ply:IsFlagSet(FL_FROZEN) then
+            RunConsoleCommand(prefix, 'unfreeze', identifier)
+        else
+            RunConsoleCommand(prefix, 'freeze', identifier)
         end
-    }
-})
+    end
+
+    sap.CreateCommand('freeze', {
+        name = 'Freeze',
+        icon = 'https://i.imgur.com/LgPUsyg.png',
+        callbacks = {
+            ['sam'] = function(ply)
+                ToggleFreeze('sam', ply:SteamID64(), ply)
+            end,
+            ['serverguard'] = function(ply)
+                RunConsoleCommand('sg', 'freeze', ply:SteamID())
+            end,
+            ['fadmin'] = function(ply)
+                ToggleFreeze('fadmin', ply:SteamID(), ply)
+            end,
+            ['ulx'] = function(ply)
+                ToggleFreeze('ulx', ply:Name(), ply)
+            end
+        }
+    })
+end
 
 sap.CreateCommand('return', {
     name = 'Return',
@@ -63,6 +74,9 @@ sap.CreateCommand('return', {
         end,
         ['serverguard'] = function(ply)
             RunConsoleCommand('sg', 'return', ply:SteamID())
+        end,
+        ['fadmin'] = function(ply)
+            RunConsoleCommand('fadmin', 'return', ply:SteamID())
         end,
         ['ulx'] = function(ply)
             RunConsoleCommand('ulx', 'return', ply:Name())
