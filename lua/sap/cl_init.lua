@@ -17,6 +17,7 @@ end
 do
     local popups = {}
 
+    local WritePlayer = sap.WritePlayer
     local ReadPlayer = sap.ReadPlayer
     local ReadString = net.ReadString
     local SendToServer = net.SendToServer
@@ -24,10 +25,13 @@ do
     local insert = table.insert
     local format = string.format
     local ipairs = ipairs
+    local remove = table.remove
+    local scale = ScreenScale
+    local timer_Simple = timer.Simple
 
     local function movePopups()
-        local basePos = ScreenScale(5)
-        local gap = ScreenScale(2)
+        local basePos = scale(5)
+        local gap = scale(2)
         local x, y = basePos, basePos
         for _, popup in ipairs(popups) do
             if popup.finished then
@@ -51,26 +55,39 @@ do
         end
     end
 
+    local function closePopup(popup)
+        popup.finished = true
+        movePopups()
+        popup:AlphaTo(0, 0.33, nil, function(anim, panel)
+            for index, popup2 in ipairs(popups) do
+                if popup2 == panel then
+                    remove(popups, index)
+                    break
+                end
+            end
+            panel:Remove()
+        end)
+    end
+
     net.Receive('sap:NewTicket', function()
-        local ply, text = ReadPlayer(), ReadString()
+        local creator, text = ReadPlayer(), ReadString()
 
         local popup = vgui.Create('sap.Popup')
         popup:SetPos(10, 10)
         popup:SetSize(ScrW() * 0.2, 1)
-        popup:SetPlayer(ply, text)
+        popup:SetPlayer(creator, text)
         popup:SetPaintedManually(true)
         popup.btnClose.DoClick = function()
-            popup.finished = true
-            movePopups()
-            popup:AlphaTo(0, 0.33, nil, function(anim, panel)
-                panel:Remove()
-                table.remove(popups, panel.index)
-            end)
+            closePopup(popup)
         end
 
-        popup.index = insert(popups, popup)
+        if creator == LocalPlayer() then
+            popup.btnClose:SetVisible(false)
+        end
 
-        timer.Simple(0.66, function()
+        insert(popups, popup)
+
+        timer_Simple(0.66, function()
             if IsValid(popup) then
                 local height = popup:GetBestHeight()
                 popup:SetPaintedManually(false)
@@ -88,12 +105,7 @@ do
         local popup = findPopup(ply)
 
         if IsValid(popup) then
-            popup.finished = true
-            movePopups()
-            popup:AlphaTo(0, 0.33, nil, function(anim, panel)
-                panel:Remove()
-                table.remove(popups, panel.index)
-            end)
+            closePopup(popup)
         end
     end)
 
@@ -109,9 +121,9 @@ do
 
             if admin == LocalPlayer() then
                 popup.claim.name:SetText('Close')
-                popup.claim.callback = function(ply)
+                popup.claim.callback = function(target)
                     net_Start('sap:CloseTicket')
-                        sap.WritePlayer(popup.player)
+                        WritePlayer(target)
                     SendToServer()
                 end
                 popup.btnClose:SetVisible(false)
